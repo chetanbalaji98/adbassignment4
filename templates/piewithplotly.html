@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% include 'headers.html' %}
+    <meta charset="UTF-8" />
+    <title>Pie Chart</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  </head>
+  <body>
+    <h1>Pie Chart</h1>
+    <div id="chart">{{ chart|safe }}</div>
+  </body>
+</html>

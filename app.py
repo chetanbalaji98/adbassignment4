@@ -5,6 +5,8 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import base64
 import io
+import plotly
+import plotly.graph_objs as go
 
 application = app = Flask(__name__)
 app.secret_key = "Secret Key"
@@ -174,6 +176,114 @@ def task3():
     figdata_jpeg = base64.b64encode(figfile.getvalue())
     files = figdata_jpeg.decode('utf-8')
     return render_template('task3.html', outputthree = files)
+
+@app.route('/pie', methods=['GET', 'POST'])
+def pie():
+    data_values = []
+    data_pie = []
+    labels = []
+    pct_val = []
+    percentages=[]
+    nval = request.form.get("task1")
+    print(nval)
+    cursor.execute("select MAX(mag) from all_month")
+    for data in cursor:
+        for value in data:
+            data_max = value
+    print("data_max")
+    print(data_max)
+    cursor.execute("select MIN(mag) from all_month")
+    for data in cursor:
+        for value in data:
+            data_min = value
+
+    data_bin =  (data_max - data_min)/int(nval)
+
+    print("data_bin")
+    print(data_bin)
+    
+    print("data_min")
+    print(data_min)
+
+    for i in range(int(nval)+1):
+        val = data_min + (data_bin * i)
+        data_values.append(val)
+
+    for i in range (len(data_values)-1):
+        cursor.execute("select mag from all_month where mag >= {} and mag <= {}".format(data_values[i], data_values[i+1]))
+        lengthcheck = cursor.fetchall()
+        data_pie.append(len(lengthcheck))  
+
+    for i in range(len(data_values) -1):
+        labelss = "{} - {}".format(data_values[i], data_values[i+1])
+        labels.append(labelss)
+
+    
+    for i in range(len(data_pie)):
+        val=data_pie[i]/10944
+        finval=val*100
+        ufinval=str(finval)+"%"
+        percentages.append(ufinval)
+
+    print("Data Values")
+    print(data_values)
+    print("data_pie")
+    print(data_pie)
+    print (len(percentages))
+
+    print(percentages)
+
+    plt.figure(figsize =(6, 6))
+    plt.title("Here is a pie chart with {} Slices".format(nval))
+    plt.pie(data_pie, labels=percentages, startangle=0, autopct=None)
+    legend1=plt.legend(data_pie, labels=data_pie, loc=1)
+    plt.legend(data_pie, labels=labels,loc=3)
+    plt.gca().add_artist(legend1)
+    figfile = io.BytesIO()
+    plt.savefig(figfile, format='jpeg')
+    plt.close()
+    figfile.seek(0)
+    figdata_jpeg = base64.b64encode(figfile.getvalue())
+    files = figdata_jpeg.decode('utf-8')   
+    return render_template('pie.html', outputfour = files, )
+
+@app.route('/piewithplotly',methods=['GET','POST'])
+def piewithplotly():
+    # retrieve user input from form
+    n = int(request.form['task1'])
+
+    # calculate ranges
+    crsr.execute("SELECT MIN(column1), MAX(column1) FROM data2")
+    result = crsr.fetchone()
+    min_mag, max_mag = result[0], result[1]
+    range_size = (max_mag - min_mag) / n
+
+    # build query to count number of entries in each range
+    count_query = "SELECT COUNT(*) FROM data2 WHERE column1 >= ? AND column1 <= ?"
+
+    # retrieve counts for each range
+    counts = []
+    for i in range(n):
+        lower_bound = min_mag + i * range_size
+        upper_bound = lower_bound + range_size
+        crsr.execute(count_query, (lower_bound, upper_bound))
+        result = crsr.fetchone()
+        counts.append(result[0])
+
+    # calculate fraction of data in each slice
+    total_count = sum(counts)
+    fractions = [count / total_count for count in counts]
+
+    # generate Pie Chart
+    labels = [f"Range {i+1}" for i in range(n)]
+    fig = go.Figure(data=[go.Pie(labels=labels, values=fractions, hole=0.6)])
+    fig.update_traces(textposition='inside', textinfo='percent+label')
+    fig.update_layout(width=800, height=600)
+
+    # render Pie Chart in HTML template
+    chart = fig.to_html(full_html=False)
+
+    return render_template('piewithplotly.html', chart=chart)
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -93,5 +93,53 @@
 <hr>
 <br>
 
+<div class="container">
+    <div class="row">
+        <div>
+            Question 13: Pie Chart earthquake dataset
+         </div>
+            <div class="card text-center">
+                <div class="card-body">
+                  <h5 class="card-title">Allow a user to give a number N, and show a pie chart with N slices</h5>
+                  <br>
+                  <form action='/pie' method="POST", method="GET">
+                    <label id="labels">Please Enter N </label>
+                    <input type="text" id="task1" name="task1" placeholder="Ex: 125" style="width: 30%;margin-right: 2%;" required/>
+                    <br><br>
+                    <input class="btn btn-secondary" type="submit" id="button" value="Submit"/>
+                  </form>  
+                </div>
+            </div>
+    </div>
+</div>
+
+<br>
+<hr>
+<br>
+
+<div class="container">
+  <div class="row">
+      <div>
+          Question 14: Pie Chart with plotly
+       </div>
+          <div class="card text-center">
+              <div class="card-body">
+                <h5 class="card-title">Allow a user to give a number N, and show a pie chart with N slices</h5>
+                <br>
+                <form action='/piewithplotly' method="POST", method="GET">
+                  <label id="labels">Please Enter N </label>
+                  <input type="text" id="task1" name="task1" placeholder="Ex: 125" style="width: 30%;margin-right: 2%;" required/>
+                  <br><br>
+                  <input class="btn btn-secondary" type="submit" id="button" value="Submit"/>
+                </form>  
+              </div>
+          </div>
+  </div>
+</div>
+
+<br>
+<hr>
+<br>
+
 
 {% endblock %}
