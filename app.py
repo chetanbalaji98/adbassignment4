@@ -37,38 +37,61 @@ def task1():
     data_pie = []
     labels = []
     pct_val = []
+    percentages=[]
     nval = request.form.get("task1")
     cursor.execute("select MAX(column1) from data2")
     for data in cursor:
         for value in data:
             data_max = value
+    print("data_max")
+    print(data_max)
     cursor.execute("select MIN(column1) from data2")
     for data in cursor:
         for value in data:
             data_min = value
+
     data_bin =  (data_max - data_min)/int(nval)
-    tmp = 30
+
+    print("data_bin")
+    print(data_bin)
+    
+    print("data_min")
+    print(data_min)
+
     for i in range(int(nval)+1):
-        val =  tmp + data_bin
-        tmp = val
+        val = data_min + (data_bin * i)
         data_values.append(val)
+
     for i in range (len(data_values)-1):
-        cursor.execute("select column1 from data2 where column1 >= {} and column1 < {}".format(data_values[i], data_values[i+1]))
+        cursor.execute("select column1 from data2 where column1 >= {} and column1 <= {}".format(data_values[i], data_values[i+1]))
         lengthcheck = cursor.fetchall()
         data_pie.append(len(lengthcheck))  
+
     for i in range(len(data_values) -1):
         labelss = "{} - {}".format(data_values[i], data_values[i+1])
         labels.append(labelss)
-    print(data_pie)
-    print(data_values)
+
+    
     for i in range(len(data_pie)):
-        val_pct = (data_pie[i] / int(data_values[i])) * 100
-        val_pct = float(val_pct)
-        pct_val.append(val_pct)
+        val=data_pie[i]/50
+        finval=val*100
+        ufinval=str(finval)+"%"
+        percentages.append(ufinval)
+
+    print("Data Values")
+    print(data_values)
+    print("data_pie")
+    print(data_pie)
+    print (len(percentages))
+
+    print(percentages)
+
     plt.figure(figsize =(7, 7))
     plt.title("Here is a pie chart with {} Slices".format(nval))
-    plt.pie(data_pie, labels=data_pie, startangle=0, autopct= "%1.2f%%")
-    plt.legend(data_pie, labels=labels, loc="upper right", bbox_to_anchor=(1.1,1.025))
+    plt.pie(data_pie, labels=percentages, startangle=0, autopct=None)
+    legend1=plt.legend(data_pie, labels=data_pie, loc=1)
+    plt.legend(data_pie, labels=labels,loc=3)
+    plt.gca().add_artist(legend1)
     figfile = io.BytesIO()
     plt.savefig(figfile, format='jpeg')
     plt.close()
@@ -93,6 +116,7 @@ def task2():
     for data in cursor:
         for value in data:
             data_min = value
+    print(data_max,data_min)
     data_bin = int(data_max - data_min)/int(nvalue)
     for i in range(int(nvalue)+1):
         val = data_min + (data_bin * i)
@@ -109,7 +133,9 @@ def task2():
     plt.title("Here is a bar chart with {} bars".format(nvalue))
     plt.xlabel("Type")
     plt.ylabel("Count")
-    bars  = plt.barh(data1_tab, limits)
+    colors=['red','grey','green']
+    bars  = plt.barh(data1_tab, limits,color=colors)
+    
     plt.bar_label(bars)
     figfile = io.BytesIO()
     plt.savefig(figfile, format='jpeg')
@@ -126,7 +152,7 @@ def task3():
     yax = []
     xax = [] 
     
-    cursor.execute("select * from data2 where column1 > {} and column1 < {}".format(lowval, highval))
+    cursor.execute("select * from data2 where column1 >= {} and column1 <= {}".format(lowval, highval))
     for data in cursor:
         yaxis =  data[0] + data[1]
         xaxis = data[0]
@@ -140,6 +166,7 @@ def task3():
     plt.xlabel("Type")
     plt.ylabel("Count")
     plt.scatter(xax, yax)
+    #plt.hist(xax)
     figfile = io.BytesIO()
     plt.savefig(figfile, format='jpeg')
     plt.close()
