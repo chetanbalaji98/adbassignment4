@@ -35,55 +35,123 @@ cursor = conn.cursor()
 def index():
     return render_template("index.html")
 
-@app.route('/question10a', methods=['GET', 'POST'])
+@app.route('/question10a',methods=['GET','POST'])
 def question10a():
-    nvalue = request.form.get("task2")
-    lowval =  request.form.get("task21")
-    highval = request.form.get("task22")
+    r_from = int(request.form['low'])
+    r_to = int(request.form['high'])
+    n = int(request.form['n'])
 
-
-    print(nvalue, lowval, highval)
-    data1_tab = []
-    limits = []
-    cursor.execute("select MAX(S) from datas where S>{} and S<{}".format(lowval, highval))
-    for data in cursor:
-        for value in data:
-            data_max = value
-    cursor.execute("select MIN(S) from datas where S>{} and S<{}".format(lowval, highval))
-    for data in cursor:
-        for value in data:
-            data_min = value
-
-    print(data_max,data_min)
-    data_bin = int(data_max - data_min)/int(nvalue)
-    for i in range(int(nvalue)+1):
-        val = data_min + (data_bin * i)
-        val = "%.2f" % val
-        data1_tab.append(val)
-    for i in range (len(data1_tab)-1):
-        cursor.execute("select S from datas where S > {} and S < {}".format(data1_tab[i], data1_tab[i+1]))
-        lengthcheck = cursor.fetchall()
-        limits.append(len(lengthcheck)) 
     
-    print(data_min, data_max)
-    print(data1_tab, limits)
-    plt.figure(figsize =(6, 6))
-    plt.title("Here is a bar chart with {} bars".format(nvalue))
-    plt.xlabel("Type")
-    plt.ylabel("Count")
-    colors=['green']
-    bars  = plt.barh(data1_tab, limits,color=colors)
+    crsr.execute("SELECT S FROM datas")
+    s_data = [row.S for row in crsr.fetchall()]
+    s_data = s_data[r_from:r_to+1]
     
-    plt.bar_label(bars)
-    figfile = io.BytesIO()
-    plt.savefig(figfile, format='jpeg')
-    plt.close()
-    figfile.seek(0)
-    figdata_jpeg = base64.b64encode(figfile.getvalue())
-    files = figdata_jpeg.decode('utf-8')
-    return render_template('question10a.html', outputtwo = files,)
+    s_range = max(s_data) - min(s_data)
+    range_size = s_range // n
+    s_ranges = [min(s_data) + range_size*i for i in range(n)]
+    s_ranges.append(max(s_data))
+
+    
+    s_bins = [0] * n
+    for s in s_data:
+        for i in range(n):
+            if s >= s_ranges[i] and s <= s_ranges[i+1]:
+                s_bins[i] += 1
+                break
+
+    
+    sorted_bins = sorted(s_bins,reverse=True)
+
+    
+    trace = go.Bar(
+        x=sorted_bins,
+        y=["{} to {}".format(s_ranges[s], s_ranges[s+1]) for s in range(n)],
+        orientation='h',
+        marker=dict(
+            color='green'
+        ),
+        text=sorted_bins,
+        textposition='outside'
+    )
+    layout = go.Layout(
+        width=700,
+        height=500,
+        margin=dict(
+            l=150,
+            r=50,
+            b=50,
+            t=50,
+            pad=4
+        ),
+        xaxis=dict(
+            title='Number of Values'
+        ),
+        yaxis=dict(
+            title='S Ranges'
+        ),
+    )
+    fig = go.Figure(data=[trace], layout=layout)
+    return render_template('question10a.html', chart=fig.to_html())
 
 
+
+@app.route('/question11',methods=['GET','POST'])
+def question11():
+    r_from = int(request.form['low'])
+    r_to = int(request.form['high'])
+    n = int(request.form['n'])
+
+        
+    crsr.execute("SELECT S FROM datas")
+    s_data = [row.S for row in crsr.fetchall()]
+    s_data = s_data[r_from:r_to+1]
+
+        
+    s_range = max(s_data) - min(s_data)
+    range_size = s_range // n
+    s_ranges = [min(s_data) + range_size*i for i in range(n)]
+    s_ranges.append(max(s_data))
+
+        
+    s_bins = [0] * n
+    for s in s_data:
+        for i in range(n):
+            if s >= s_ranges[i] and s <= s_ranges[i+1]:
+                s_bins[i] += 1
+                break
+
+        
+    sorted_bins = sorted(s_bins, reverse=True)
+    trace = go.Pie(
+        labels=["{} to {}".format(s_ranges[s], s_ranges[s+1]) for s in range(n)],
+        values=sorted_bins,
+        textinfo='value+percent',
+        insidetextorientation='radial',
+        hole=0.4,
+        marker=dict(
+            colors=['#4285F4', '#DB4437', '#F4B400', '#0F9D58'],
+            line=dict(color='#FFFFFF', width=2)
+        ),
+        textfont=dict(size=12)
+    )
+
+    layout = go.Layout(
+        width=900,
+        height=500,
+        margin=dict(
+            l=50,
+            r=50,
+            b=50,
+            t=50,
+            pad=4
+        ),
+        title='S Ranges',
+        title_x=0.5,
+        legend=dict(orientation='h', x=0.5, y=1.1),
+    )
+
+    fig = go.Figure(data=[trace], layout=layout)
+    return render_template('question11.html', chart=fig.to_html())
 
 
 @app.route('/question12', methods=['GET', 'POST'])
