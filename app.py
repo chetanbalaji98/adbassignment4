@@ -107,8 +107,8 @@ def question11():
     crsr.execute("SELECT S FROM datas")
     s_data = [row.S for row in crsr.fetchall()]
     s_data = s_data[r_from:r_to+1]
-
-        
+    s_data.pop()
+    print(s_data)   
     s_range = max(s_data) - min(s_data)
     range_size = s_range // n
     s_ranges = [min(s_data) + range_size*i for i in range(n)]
