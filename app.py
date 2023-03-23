@@ -46,7 +46,7 @@ def question10a():
     s_data = [row.S for row in crsr.fetchall()]
     s_data = s_data[r_from:r_to+1]
     print(s_data)
-    s_data.pop()
+    #s_data.pop()
     print(s_data)
     s_range = max(s_data) - min(s_data)
     range_size = s_range // n
@@ -107,7 +107,7 @@ def question11():
     crsr.execute("SELECT S FROM datas")
     s_data = [row.S for row in crsr.fetchall()]
     s_data = s_data[r_from:r_to+1]
-    s_data.pop()
+    #s_data.pop()
     print(s_data)   
     s_range = max(s_data) - min(s_data)
     range_size = s_range // n
@@ -122,7 +122,7 @@ def question11():
                 s_bins[i] += 1
                 break
 
-                
+
     sorted_bins = sorted(s_bins, reverse=True)
     trace = go.Pie(
         labels=["{} to {}".format(s_ranges[s], s_ranges[s+1]) for s in range(n)],
@@ -138,13 +138,13 @@ def question11():
     )
 
     layout = go.Layout(
-        width=900,
+        width=1400,
         height=500,
         margin=dict(
-            l=50,
-            r=50,
-            b=50,
-            t=50,
+            l=150,
+            r=150,
+            b=150,
+            t=150,
             pad=4
         ),
         title='S Ranges',
