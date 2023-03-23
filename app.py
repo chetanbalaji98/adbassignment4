@@ -122,7 +122,7 @@ def question11():
                 s_bins[i] += 1
                 break
 
-        
+                
     sorted_bins = sorted(s_bins, reverse=True)
     trace = go.Pie(
         labels=["{} to {}".format(s_ranges[s], s_ranges[s+1]) for s in range(n)],
