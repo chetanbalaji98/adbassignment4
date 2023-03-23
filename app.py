@@ -76,10 +76,10 @@ def question10a():
         textposition='outside'
     )
     layout = go.Layout(
-        width=700,
-        height=500,
+        width=1000,
+        height=550,
         margin=dict(
-            l=150,
+            l=250,
             r=50,
             b=50,
             t=50,
