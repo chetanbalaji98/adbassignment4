@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import base64
 import io
 import plotly
+import json
+from markupsafe import Markup
 import plotly.graph_objs as go
 
 application = app = Flask(__name__)
@@ -284,6 +286,42 @@ def piewithplotly():
     chart = fig.to_html(full_html=False)
 
     return render_template('piewithplotly.html', chart=chart)
+
+
+@app.route('/barwithplotly', methods=['GET', 'POST'])
+def barwithplotly():
+    nvalue = request.form.get("task2")
+    lowval =  request.form.get("task21")
+    highval = request.form.get("task22")
+    print(nvalue, lowval, highval)
+    data1_tab = []
+    limits = []
+    cursor.execute("select MAX(column2) from data2 where column2>{} and column2<{}".format(lowval, highval))
+    for data in cursor:
+        for value in data:
+            data_max = value
+    cursor.execute("select MIN(column2) from data2 where column2>{} and column2<{}".format(lowval, highval))
+    for data in cursor:
+        for value in data:
+            data_min = value
+    print(data_max,data_min)
+    data_bin = int(data_max - data_min)/int(nvalue)
+    for i in range(int(nvalue)+1):
+        val = data_min + (data_bin * i)
+        val = "%.2f" % val
+        data1_tab.append(val)
+    for i in range (len(data1_tab)-1):
+        cursor.execute("select column2 from data2 where column2 > {} and column2 < {}".format(data1_tab[i], data1_tab[i+1]))
+        lengthcheck = cursor.fetchall()
+        limits.append(len(lengthcheck)) 
+    data1_tab.pop()
+    print(data_min, data_max)
+    print(data1_tab, limits)
+    bar_fig = go.Figure([go.Bar(x=data1_tab,y=limits)])
+    fig_json=json.dumps(bar_fig, cls=plotly.utils.PlotlyJSONEncoder)
+    return render_template('barwithplotly.html',plot=Markup(fig_json))
+
+    #return render_template('barwithplotly.html', outputtwo = files,)
 
 if __name__ == "__main__":
     app.run(debug=True)

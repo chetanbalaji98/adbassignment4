@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+
+<body>
+    
+
+    <h2><b>Bar chart</b></h2>
+    <div id='chart' class='chart'>
+        {% block javascript %}
+        <script type='text/javascript'>
+            var fig = {{ plot }}
+            Plotly.plot('chart', fig.data, fig.layout, { displaylogo: false });
+    //console.log(JSON.parse({{plot}}))
+        </script>
+        {% endblock %}
+    </div>
+</body>
