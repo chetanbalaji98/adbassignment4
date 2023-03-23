@@ -45,7 +45,9 @@ def question10a():
     crsr.execute("SELECT S FROM datas")
     s_data = [row.S for row in crsr.fetchall()]
     s_data = s_data[r_from:r_to+1]
-    
+    print(s_data)
+    s_data.pop()
+    print(s_data)
     s_range = max(s_data) - min(s_data)
     range_size = s_range // n
     s_ranges = [min(s_data) + range_size*i for i in range(n)]
@@ -84,10 +86,10 @@ def question10a():
             pad=4
         ),
         xaxis=dict(
-            title='Number of Values'
+            title='Number of Values in each range'
         ),
         yaxis=dict(
-            title='S Ranges'
+            title='S column Ranges'
         ),
     )
     fig = go.Figure(data=[trace], layout=layout)
