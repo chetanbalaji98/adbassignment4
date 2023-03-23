@@ -35,6 +35,103 @@ cursor = conn.cursor()
 def index():
     return render_template("index.html")
 
+@app.route('/question10a', methods=['GET', 'POST'])
+def question10a():
+    nvalue = request.form.get("task2")
+    lowval =  request.form.get("task21")
+    highval = request.form.get("task22")
+
+
+    print(nvalue, lowval, highval)
+    data1_tab = []
+    limits = []
+    cursor.execute("select MAX(S) from datas where S>{} and S<{}".format(lowval, highval))
+    for data in cursor:
+        for value in data:
+            data_max = value
+    cursor.execute("select MIN(S) from datas where S>{} and S<{}".format(lowval, highval))
+    for data in cursor:
+        for value in data:
+            data_min = value
+
+    print(data_max,data_min)
+    data_bin = int(data_max - data_min)/int(nvalue)
+    for i in range(int(nvalue)+1):
+        val = data_min + (data_bin * i)
+        val = "%.2f" % val
+        data1_tab.append(val)
+    for i in range (len(data1_tab)-1):
+        cursor.execute("select S from datas where S > {} and S < {}".format(data1_tab[i], data1_tab[i+1]))
+        lengthcheck = cursor.fetchall()
+        limits.append(len(lengthcheck)) 
+    
+    print(data_min, data_max)
+    print(data1_tab, limits)
+    plt.figure(figsize =(6, 6))
+    plt.title("Here is a bar chart with {} bars".format(nvalue))
+    plt.xlabel("Type")
+    plt.ylabel("Count")
+    colors=['green']
+    bars  = plt.barh(data1_tab, limits,color=colors)
+    
+    plt.bar_label(bars)
+    figfile = io.BytesIO()
+    plt.savefig(figfile, format='jpeg')
+    plt.close()
+    figfile.seek(0)
+    figdata_jpeg = base64.b64encode(figfile.getvalue())
+    files = figdata_jpeg.decode('utf-8')
+    return render_template('question10a.html', outputtwo = files,)
+
+
+
+
+@app.route('/question12', methods=['GET', 'POST'])
+def question12():
+    lowval = request.form.get("task31")
+    highval = request.form.get("task32")
+    yax = []
+    xax = [] 
+    
+    cursor.execute("select S, T from datas where R >= {} and R <= {}".format(lowval, highval))
+    for data in cursor:
+        yaxis =  data[0]
+        xaxis = data[1]
+        yaxis = "%.2f" % yaxis
+        yaxis = float(yaxis)
+        yax.append(yaxis)
+        xax.append(xaxis)
+
+    plt.figure(figsize =(6, 6))
+    plt.title("Here is a scatter plot")
+    plt.xlabel("S")
+    plt.ylabel("T")
+    plt.scatter(xax, yax)
+    figfile = io.BytesIO()
+    plt.savefig(figfile, format='jpeg')
+    plt.close()
+    figfile.seek(0)
+    figdata_jpeg = base64.b64encode(figfile.getvalue())
+    files = figdata_jpeg.decode('utf-8')
+    return render_template('question12.html', outputthree = files)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/task1', methods=['GET', 'POST'])
 def task1():
     data_values = []
