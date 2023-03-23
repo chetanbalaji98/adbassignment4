@@ -134,12 +134,12 @@ def question11():
             colors=['#4285F4', '#DB4437', '#F4B400', '#0F9D58'],
             line=dict(color='#FFFFFF', width=2)
         ),
-        textfont=dict(size=12)
+        textfont=dict(size=12),textposition="outside"
     )
 
     layout = go.Layout(
-        width=1400,
-        height=500,
+        width=1700,
+        height=1000,
         margin=dict(
             l=150,
             r=150,
@@ -165,8 +165,8 @@ def question12():
     
     cursor.execute("select S, T from datas where R >= {} and R <= {}".format(lowval, highval))
     for data in cursor:
-        yaxis =  data[0]
-        xaxis = data[1]
+        xaxis =  data[0]
+        yaxis = data[1]
         yaxis = "%.2f" % yaxis
         yaxis = float(yaxis)
         yax.append(yaxis)
